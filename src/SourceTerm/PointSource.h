@@ -64,10 +64,11 @@ namespace seissol {
      *
      **/    
     void transformMomentTensor(real const i_localMomentTensor[3][3],
+                               real const i_localVelocityComponent[3],
                                real strike,
                                real dip,
                                real rake,
-                               real o_momentTensor[NUMBER_OF_QUANTITIES]);
+                               real o_forceComponents[NUMBER_OF_QUANTITIES]);
 
     /** Converts equally spaced time samples to a one-dimensional
      *  piecewise linear function.
@@ -123,14 +124,14 @@ namespace seissol {
                                  double i_fromTime,
                                  double i_toTime);
 
-    void addTimeIntegratedPointSourceNRF( real const i_mInvJInvPhisAtSources[NUMBER_OF_ALIGNED_BASIS_FUNCTIONS],
+    void addTimeIntegratedPointSourceNRF( real const i_mInvJInvPhisAtSources[tensor::mInvJInvPhisAtSources::size()],
                                           real const faultBasis[9],
                                           real muA,
                                           real lambdaA,
                                           PiecewiseLinearFunction1D const slipRates[3],
                                           double i_fromTime,
                                           double i_toTime,
-                                          real o_dofUpdate[NUMBER_OF_ALIGNED_DOFS] );
+                                          real o_dofUpdate[tensor::Q::size()] );
     /**
      * Point sources in SeisSol (\delta(x-x_s) * S(t)).
      * 
@@ -139,12 +140,12 @@ namespace seissol {
      * as outer product of two vectors (i.e. yields a rank-1 dof-update-matrix that shall
      * be scaled with the time integral of the source term).
      **/                                      
-    void addTimeIntegratedPointSourceFSRM( real const i_mInvJInvPhisAtSources[NUMBER_OF_ALIGNED_BASIS_FUNCTIONS],
-                                           real const i_momentTensor[NUMBER_OF_QUANTITIES],
+    void addTimeIntegratedPointSourceFSRM( real const i_mInvJInvPhisAtSources[tensor::mInvJInvPhisAtSources::size()],
+                                           real const i_forceComponents[tensor::momentFSRM::size()],
                                            PiecewiseLinearFunction1D const* i_pwLF,
                                            double i_fromTime,
                                            double i_toTime,
-                                           real o_dofUpdate[NUMBER_OF_ALIGNED_DOFS] );
+                                           real o_dofUpdate[tensor::Q::size()] );
   }
 }
 

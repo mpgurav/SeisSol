@@ -50,9 +50,7 @@
 void seissol::writer::WaveFieldWriter::enable()
 {
 	m_enabled = true;
-#ifdef GENERATEDKERNELS
 	seissol::SeisSol::main.checkPointManager().header().add(m_timestepComp);
-#endif // GENERATEDKERNELS
 }
 
 seissol::refinement::TetrahedronRefiner<double>* seissol::writer::WaveFieldWriter::createRefiner(int refinement) {
@@ -64,15 +62,15 @@ seissol::refinement::TetrahedronRefiner<double>* seissol::writer::WaveFieldWrite
 		tetRefiner = new refinement::IdentityRefiner<double>();
 		break;
 	case 1:
-		logInfo(rank) << "Refinement Startegy is \"Divide by 4\"";
+		logInfo(rank) << "Refinement Strategy is \"Divide by 4\"";
 		tetRefiner = new refinement::DivideTetrahedronBy4<double>();
 		break;
 	case 2:
-		logInfo(rank) << "Refinement Startegy is \"Divide by 8\"";
+		logInfo(rank) << "Refinement Strategy is \"Divide by 8\"";
 		tetRefiner = new refinement::DivideTetrahedronBy8<double>();
 		break;
 	case 3:
-		logInfo(rank) << "Refinement Startegy is \"Divide by 32\"";
+		logInfo(rank) << "Refinement Strategy is \"Divide by 32\"";
 		tetRefiner = new refinement::DivideTetrahedronBy32<double>();
 		break;
 	default:
@@ -133,11 +131,7 @@ void seissol::writer::WaveFieldWriter::init(unsigned int numVars,
 	/** All initialization parameters */
 	WaveFieldInitParam param;
 
-#ifdef GENERATEDKERNELS
 	param.timestep = seissol::SeisSol::main.checkPointManager().header().value(m_timestepComp);
-#else // GENERATEDKERNELS
-	param.timestep = 0;
-#endif // GENERATEDKERNELS
 
 	/** List of all buffer ids */
 	param.bufferIds[OUTPUT_PREFIX] = addSyncBuffer(m_outputPrefix.c_str(), m_outputPrefix.size()+1, true);
@@ -269,7 +263,6 @@ void seissol::writer::WaveFieldWriter::init(unsigned int numVars,
 
 	// Save number of cells
 	m_numCells = meshRefiner->getNumCells();
-#ifdef GENERATEDKERNELS
 	// Set up for low order output flags
 	m_lowOutputFlags = new bool[WaveFieldWriterExecutor::NUM_LOWVARIABLES];
 	m_numIntegratedVariables = seissol::SeisSol::main.postProcessor().getNumberOfVariables();
@@ -278,7 +271,6 @@ void seissol::writer::WaveFieldWriter::init(unsigned int numVars,
 	}
 	seissol::SeisSol::main.postProcessor().getIntegrationMask(&m_lowOutputFlags[WaveFieldWriterExecutor::NUM_PLASTICITY_VARIABLES]);
 	param.bufferIds[LOW_OUTPUT_FLAGS] = addSyncBuffer(m_lowOutputFlags, WaveFieldWriterExecutor::NUM_LOWVARIABLES*sizeof(bool), true);
-#endif
 	//
 	//  Low order I/O
 	//
@@ -457,9 +449,7 @@ void seissol::writer::WaveFieldWriter::write(double time)
 	call(param);
 
 	// Update last time step
-#ifdef GENERATEDKERNELS
 	seissol::SeisSol::main.checkPointManager().header().value(m_timestepComp)++;
-#endif // GENERATEDKERNELS
 
 	m_stopwatch.pause();
 
